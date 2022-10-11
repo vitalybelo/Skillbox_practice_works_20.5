@@ -1,0 +1,20 @@
+Fish caught: 0
+Finished at: Tue Oct 11 15:59:47 2022
+
+
+bass
+bullhead
+bass
+carp
+bass
+jellyfish
+carp
+Fish caught: 7
+Finished at: Tue Oct 11 16:00:15 2022
+
+
+walleye
+Fish caught: 1
+Finished at: Tue Oct 11 16:14:29 2022
+
+
