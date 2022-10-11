@@ -1,5 +1,6 @@
 #ifndef SKILLBOX_PRACTICE_WORKS_20_5_EMPLOYEE_H
 #define SKILLBOX_PRACTICE_WORKS_20_5_EMPLOYEE_H
+
 #pragma once
 #include <iostream>
 #include <fstream>

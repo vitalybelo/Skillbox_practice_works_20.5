@@ -3,19 +3,24 @@
 #include "Employee.h"
 using namespace std;
 
+/**
+ * Напросился класс, худенький но местами симпатичный.
+ * Реализована полная проверка вводимой даты, включая дни
+ * нужна папка data/ в каталоге где лежат *.срр
+ */
 int main() {
 
     setlocale(LC_ALL, "RUS");
 
     string firstName, lastName, payDate;
-    ofstream fileWriter("../data/employee.data", ios::in | ios::app);
+    ofstream fileWriter("../data/employee.data", ios::out | ios::app);
 
     cout << endl;
     cout << "Entry employee name: ";
-    cin >> firstName;
+        cin >> firstName;
 
     cout << "Entry employee surname: ";
-    cin >> lastName;
+        cin >> lastName;
 
     bool validDate;
     do {
@@ -25,9 +30,9 @@ int main() {
             cout << "Invalid date format. Please repeat.\n";
     } while (!validDate);
 
-    cout << "Entry payment amount: ";
     int payAmount;
-    cin >> payAmount;
+    cout << "Entry payment amount: ";
+        cin >> payAmount;
 
     Employee employee(firstName, lastName, payDate, payAmount);
     employee.saveFileRecord(fileWriter);
