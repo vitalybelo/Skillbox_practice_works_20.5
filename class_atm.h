@@ -10,13 +10,13 @@ class ClassATM {
 
 private:
 
-    const string filename = "../data/atm_pool.bin";                          // имя бекап файла
-    int atm_stack;                                                           // общее максимальное количество банкнот
-    int banknotes[6] = {5000,2000,1000,500,200,100};  // номиналы банкнот
-    int banknotes_pool[6]{};                                                 // количество банкнот каждого номинала
-    int size_pool;                                                           // количество слотов для банкнот
-    long total_amount;                                                       // остаток средств в банкомате
-    long amount;                                                             // сумма запроса для одноразовой выдачи
+    const string filename = "../data/atm_pool.bin";                          // РёРјСЏ Р±РµРєР°Рї С„Р°Р№Р»Р°
+    int atm_stack;                                                           // РѕР±С‰РµРµ РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р±Р°РЅРєРЅРѕС‚
+    int banknotes[6] = {5000,2000,1000,500,200,100};  // РЅРѕРјРёРЅР°Р»С‹ Р±Р°РЅРєРЅРѕС‚
+    int banknotes_pool[6]{};                                                 // РєРѕР»РёС‡РµСЃС‚РІРѕ Р±Р°РЅРєРЅРѕС‚ РєР°Р¶РґРѕРіРѕ РЅРѕРјРёРЅР°Р»Р°
+    int size_pool;                                                           // РєРѕР»РёС‡РµСЃС‚РІРѕ СЃР»РѕС‚РѕРІ РґР»СЏ Р±Р°РЅРєРЅРѕС‚
+    long total_amount;                                                       // РѕСЃС‚Р°С‚РѕРє СЃСЂРµРґСЃС‚РІ РІ Р±Р°РЅРєРѕРјР°С‚Рµ
+    long amount;                                                             // СЃСѓРјРјР° Р·Р°РїСЂРѕСЃР° РґР»СЏ РѕРґРЅРѕСЂР°Р·РѕРІРѕР№ РІС‹РґР°С‡Рё
 
 public:
 
@@ -42,15 +42,17 @@ public:
         fileWriter.close();
     }
 
-    void restoreATM_pool () {
+    bool restoreATM_pool () {
         ifstream fileReader(filename, ios::binary);
         if (fileReader.is_open()) {
             int i = 0;
             while (i < size_pool || !fileReader.eof()) {
                 fileReader.read((char*)&banknotes_pool[i++], sizeof (int));
             }
+            fileReader.close();
+            return true;
         }
-        fileReader.close();
+        return false;
     }
 
     void randomATM_pool() {
@@ -60,8 +62,6 @@ public:
 
         for (int i = 0; i < atm_stack; i++)
             banknotes_pool[dist(gen)]++;
-
-        backupATM_pool();
     }
 
     void printATM_pool() {
@@ -74,7 +74,6 @@ public:
 
     long getTotalAmount() {
         total_amount = 0;
-        restoreATM_pool();
         for (int i = 0; i < size_pool; i++) {
             total_amount += banknotes[i] * banknotes_pool[i];
         }
@@ -83,33 +82,31 @@ public:
 
     bool issuanceByATM (long request_amount) {
 
-        restoreATM_pool();
         amount = request_amount;
         int banknotes_count[size_pool];
 
-        // подбираем банкноты для выдачи и определяем остаток
+        // РїРѕРґР±РёСЂР°РµРј Р±Р°РЅРєРЅРѕС‚С‹ РґР»СЏ РІС‹РґР°С‡Рё Рё РѕРїСЂРµРґРµР»СЏРµРј РѕСЃС‚Р°С‚РѕРє
         for (int i = 0; i < size_pool; i++) {
-            banknotes_count[i] = amount / banknotes[i];      // считаем нужное количество банкнот 5000 -> 100
+            banknotes_count[i] = amount / banknotes[i];      // СЃС‡РёС‚Р°РµРј РЅСѓР¶РЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р±Р°РЅРєРЅРѕС‚ 5000 -> 100
 
-            if (banknotes_count[i] > banknotes_pool[i]) {    // проверяем наличие в банкомате нужных банкнот
-                banknotes_count[i] = banknotes_pool[i];      // банкнот не хватает - забираем последние
-                amount -= banknotes_count[i] * banknotes[i]; // вычисляем остаток для подбора других банкнот
+            if (banknotes_count[i] > banknotes_pool[i]) {    // РїСЂРѕРІРµСЂСЏРµРј РЅР°Р»РёС‡РёРµ РІ Р±Р°РЅРєРѕРјР°С‚Рµ РЅСѓР¶РЅС‹С… Р±Р°РЅРєРЅРѕС‚
+                banknotes_count[i] = banknotes_pool[i];      // Р±Р°РЅРєРЅРѕС‚ РЅРµ С…РІР°С‚Р°РµС‚ - Р·Р°Р±РёСЂР°РµРј РїРѕСЃР»РµРґРЅРёРµ
+                amount -= banknotes_count[i] * banknotes[i]; // РІС‹С‡РёСЃР»СЏРµРј РѕСЃС‚Р°С‚РѕРє РґР»СЏ РїРѕРґР±РѕСЂР° РґСЂСѓРіРёС… Р±Р°РЅРєРЅРѕС‚
             } else {
-                amount %= banknotes[i];                      // банкнот хватает, вычисляем остаток для подбора
+                amount %= banknotes[i];                      // Р±Р°РЅРєРЅРѕС‚ С…РІР°С‚Р°РµС‚, РІС‹С‡РёСЃР»СЏРµРј РѕСЃС‚Р°С‚РѕРє РґР»СЏ РїРѕРґР±РѕСЂР°
             }
-            // отображает количество банкнот в подборе (для отладки)
+            // РѕС‚РѕР±СЂР°Р¶Р°РµС‚ РєРѕР»РёС‡РµСЃС‚РІРѕ Р±Р°РЅРєРЅРѕС‚ РІ РїРѕРґР±РѕСЂРµ (РґР»СЏ РѕС‚Р»Р°РґРєРё)
             // cout << endl << banknotes[i] << " :: " << banknotes_count[i];
         }
 
-        // если подбор банкнот под заказанную сумму успешный - осуществляем выдачу банкнот
+        // РµСЃР»Рё РїРѕРґР±РѕСЂ Р±Р°РЅРєРЅРѕС‚ РїРѕРґ Р·Р°РєР°Р·Р°РЅРЅСѓСЋ СЃСѓРјРјСѓ СѓСЃРїРµС€РЅС‹Р№ - РѕСЃСѓС‰РµСЃС‚РІР»СЏРµРј РІС‹РґР°С‡Сѓ Р±Р°РЅРєРЅРѕС‚
         if (amount == 0) {
             for (int i = 0; i < size_pool; i++)
-                banknotes_pool[i] -= banknotes_count[i];    // забираем из пула нужное количество банкнот
-            backupATM_pool();
+                banknotes_pool[i] -= banknotes_count[i];    // Р·Р°Р±РёСЂР°РµРј РёР· РїСѓР»Р° РЅСѓР¶РЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р±Р°РЅРєРЅРѕС‚
             return true;
         }
-        // подбор не удачный, amount = сумме которую банкомат может выдать
-        amount = request_amount - amount;   // сумма которую банкомат точно может выдать
+        // РїРѕРґР±РѕСЂ РЅРµ СѓРґР°С‡РЅС‹Р№, amount = СЃСѓРјРјРµ РєРѕС‚РѕСЂСѓСЋ Р±Р°РЅРєРѕРјР°С‚ РјРѕР¶РµС‚ РІС‹РґР°С‚СЊ
+        amount = request_amount - amount;   // СЃСѓРјРјР° РєРѕС‚РѕСЂСѓСЋ Р±Р°РЅРєРѕРјР°С‚ С‚РѕС‡РЅРѕ РјРѕР¶РµС‚ РІС‹РґР°С‚СЊ
         return false;
     }
 
@@ -118,9 +115,9 @@ public:
     }
 
     void printATM_status () {
-        cout << "Банкомат загружен:\n";
+        cout << "Р‘Р°РЅРєРѕРјР°С‚ Р·Р°РіСЂСѓР¶РµРЅ:\n";
         printATM_pool();
-        cout << "Доступно для выдачи: ";
+        cout << "Р”РѕСЃС‚СѓРїРЅРѕ РґР»СЏ РІС‹РґР°С‡Рё: ";
         cout << getTotalAmount() << endl;
     }
 
