@@ -31,27 +31,28 @@ int main() {
             total_amount = atm_client.getTotalAmount();
             cout << "\nДоступно для выдачи: " << total_amount << endl;
 
-            if (total_amount > 0) {
                 do {
-                    cout << "Введите сумму выдачи (0 - выход): ";
-                    cin >> amount;
-                    if (amount > 0) {
+                    if (total_amount > 0) {
+                        cout << "Введите сумму выдачи (0 - выход): ";
+                        cin >> amount;
+                        if (amount > 0) {
 
-                        if (atm_client.issuanceByATM(amount)) {
-                            // выдача успешная
-                            total_amount = atm_client.getTotalAmount();
-                            cout << "\n\tЗаберите деньги в течение 30 секунд\n\n";
-                            cout << "Доступно для выдачи: " << total_amount << endl;
-                        } else {
-                            // выдача невозможна, предлагаем сумму которую можно выдать
-                            cout << "\n\tНевозможно выдать сумму: " << amount;
-                            cout << "\n\tПодходящая сумма для выдачи " << atm_client.getAmount() << "\n\n";
+                            if (atm_client.issuanceByATM(amount)) {
+                                // выдача успешная
+                                total_amount = atm_client.getTotalAmount();
+                                cout << "\n\tЗаберите деньги в течение 30 секунд\n\n";
+                                cout << "Доступно для выдачи: " << total_amount << endl;
+                            } else {
+                                // выдача невозможна, предлагаем сумму которую можно выдать
+                                cout << "\n\tНевозможно выдать сумму: " << amount;
+                                cout << "\n\tПодходящая сумма для выдачи " << atm_client.getAmount() << "\n\n";
+                            }
                         }
+                    } else {
+                        cout << "Банкомат пуст :: требуется пополнение.\n";
+                        break;
                     }
-                } while (amount != 0 && total_amount > 0);
-            } else {
-                cout << "Банкомат пуст :: требуется пополнение.\n";
-            }
+                } while (amount != 0);
             break;
         default:
             cout << "\nКоманда не распознана.\n";
